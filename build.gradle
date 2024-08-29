@@ -93,8 +93,16 @@ task publishJavaClientToMavenLocal(type: Exec, dependsOn: generateJavaClient) {
 }
 tasks.compileJava.dependsOn publishJavaClientToMavenLocal
 
+compileJava {
+    options.compilerArgs += '--enable-preview'
+}
+
+compileTestJava {
+    options.compilerArgs += '--enable-preview'
+}
 
 test {
+    jvmArgs += '--enable-preview'
     maxParallelForks = Runtime.runtime.availableProcessors().intdiv(2) ?: 1
     useJUnitPlatform()
     finalizedBy jacocoTestCoverageVerification
