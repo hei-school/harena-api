@@ -12,23 +12,19 @@ import school.hei.patrimoine.modele.possession.Possession;
 public class PossessionService {
   private final PatrimoineService patrimoineService;
 
-  public Optional<List<Possession>> getPossessions(String patrimoineName) {
+  public List<Possession> getPossessions(String patrimoineName) {
     String patrimoineId = StringNormalizer.apply(patrimoineName);
-    Optional<Patrimoine> patrimoine = patrimoineService.getPatrimone(patrimoineId);
+    Patrimoine patrimoine = patrimoineService.getPatrimone(patrimoineId);
 
-    return patrimoine.map(value -> value.possessions().stream().toList());
+    return patrimoine.possessions().stream().toList();
   }
 
   public Optional<Possession> getPossession(String patrimoineName, String possessionName) {
     String patrimoineId = StringNormalizer.apply(patrimoineName);
     String possessionId = StringNormalizer.apply(possessionName);
-    Optional<Patrimoine> patrimoine = patrimoineService.getPatrimone(patrimoineId);
-    if (patrimoine.isEmpty()) {
-      return Optional.empty();
-    }
+    Patrimoine patrimoine = patrimoineService.getPatrimone(patrimoineId);
     HashMap<String, Possession> possessions = new HashMap<>();
     patrimoine
-        .get()
         .possessions()
         .forEach(
             possession -> possessions.put(StringNormalizer.apply(possession.getNom()), possession));
@@ -37,20 +33,16 @@ public class PossessionService {
 
   public List<Possession> savePossessions(
       String patrimoineName, List<Possession> toSavePossessions) {
-    Optional<Patrimoine> patrimoine =
-        patrimoineService.getPatrimone(StringNormalizer.apply(patrimoineName));
-    if (patrimoine.isEmpty()) {
-      return List.of();
-    }
+    Patrimoine patrimoine = patrimoineService.getPatrimone(StringNormalizer.apply(patrimoineName));
 
-    HashMap<String, Possession> possessions = retrievePossessions(patrimoine.get());
+    HashMap<String, Possession> possessions = retrievePossessions(patrimoine);
     toSavePossessions.forEach(
         possession -> possessions.put(StringNormalizer.apply(possession.getNom()), possession));
     Patrimoine updatedPatrimoine =
         new Patrimoine(
-            patrimoine.get().nom(),
-            patrimoine.get().possesseur(),
-            patrimoine.get().t(),
+            patrimoine.nom(),
+            patrimoine.possesseur(),
+            patrimoine.t(),
             new HashSet<>(possessions.values()));
 
     patrimoineService.savePatrimoines(List.of(updatedPatrimoine));
@@ -58,12 +50,9 @@ public class PossessionService {
   }
 
   public Optional<Possession> removePossession(String patrimoineName, String possessionName) {
-    Optional<Patrimoine> patrimoine = patrimoineService.getPatrimone(patrimoineName);
-    if (patrimoine.isEmpty()) {
-      return Optional.empty();
-    }
+    Patrimoine patrimoine = patrimoineService.getPatrimone(patrimoineName);
 
-    HashMap<String, Possession> possessions = retrievePossessions(patrimoine.get());
+    HashMap<String, Possession> possessions = retrievePossessions(patrimoine);
     Optional<Possession> removedPossession =
         Optional.ofNullable(possessions.remove(StringNormalizer.apply(possessionName)));
 
@@ -71,7 +60,7 @@ public class PossessionService {
       return Optional.empty();
     }
 
-    patrimoineService.savePatrimoines(List.of(patrimoine.get()));
+    patrimoineService.savePatrimoines(List.of(patrimoine));
 
     return removedPossession;
   }

@@ -3,7 +3,6 @@ package com.harena.api.endpoint.rest.controller;
 import com.harena.api.endpoint.rest.mapper.PossesionMapper;
 import com.harena.api.endpoint.rest.model.ListPayload;
 import com.harena.api.endpoint.rest.model.Possession;
-import com.harena.api.exception.NotFoundException;
 import com.harena.api.service.PossessionService;
 import com.harena.api.utils.Page;
 import com.harena.api.utils.PageRequest;
@@ -27,8 +26,7 @@ public class PossessionController {
       @PathVariable String nomPatrimoine,
       @RequestParam("page") int pageNumber,
       @RequestParam("page_size") int pageSize) {
-    var possessions =
-        possessionService.getPossessions(nomPatrimoine).orElseThrow(NotFoundException::new);
+    var possessions = possessionService.getPossessions(nomPatrimoine);
     List<Possession> possessionList =
         possessions.stream().map(possesionMapper::toRestModel).toList();
     Pageable<Possession> possessionPageable = new Pageable<>(possessionList);

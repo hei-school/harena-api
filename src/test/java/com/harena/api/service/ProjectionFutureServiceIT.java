@@ -7,7 +7,6 @@ import static org.mockito.Mockito.when;
 
 import com.harena.api.conf.FacadeIT;
 import java.time.LocalDate;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -21,21 +20,12 @@ public class ProjectionFutureServiceIT extends FacadeIT {
 
   @Test
   void projection_future_service_test() {
-    when(patrimoineService.getPatrimone(any())).thenReturn(Optional.of(patrimoineSupplier.get()));
+    when(patrimoineService.getPatrimone(any())).thenReturn(patrimoineSupplier.get());
     var startDate = LocalDate.of(2024, 7, 27);
     var endDate = LocalDate.of(2034, 2, 16);
 
     assertFalse(subject.getFluxImpossibles("test", startDate, endDate).isEmpty());
 
     assertTrue(subject.getGraph("test", startDate, endDate).exists());
-  }
-
-  @Test
-  void projection_future_service_no_patrimoine() {
-    when(patrimoineService.getPatrimone(any())).thenReturn(Optional.empty());
-    var startDate = LocalDate.of(2024, 7, 27);
-    var endDate = LocalDate.of(2034, 2, 16);
-
-    assertTrue(subject.getFluxImpossibles("test", startDate, endDate).isEmpty());
   }
 }

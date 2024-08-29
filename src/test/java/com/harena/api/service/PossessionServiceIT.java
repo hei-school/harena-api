@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 import com.harena.api.conf.FacadeIT;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -24,8 +23,7 @@ class PossessionServiceIT extends FacadeIT {
 
   @Test
   void possessions_patrimoine_test() {
-    when(patrimoineService.getPatrimone(any()))
-        .thenReturn(Optional.of(patrimoineDeZetySupplier.get()));
+    when(patrimoineService.getPatrimone(any())).thenReturn(patrimoineDeZetySupplier.get());
     when(patrimoineService.savePatrimoines(any()))
         .thenReturn(List.of(patrimoineDeZetySupplier.get()));
 
@@ -42,26 +40,8 @@ class PossessionServiceIT extends FacadeIT {
   }
 
   @Test
-  void possessions_patrimoine_test_not_found_patrimoine() {
-    when(patrimoineService.getPatrimone(any())).thenReturn(Optional.empty());
-    when(patrimoineService.savePatrimoines(any())).thenReturn(List.of());
-
-    assertTrue(subject.getPossessions("test").isEmpty());
-    assertFalse(subject.getPossession("test", "espèces").isPresent());
-
-    var euro = new Devise("euro", 20000, LocalDate.now(), -0.2);
-
-    var testPossession =
-        new Materiel("test", LocalDate.now(), 20000, LocalDate.now().minusDays(3), -0.2, euro);
-    assertTrue(subject.savePossessions("test", List.of(testPossession)).isEmpty());
-
-    assertFalse(subject.removePossession("test", "espèces").isPresent());
-  }
-
-  @Test
   void possessions_patrimoine_test_not_found_possessions() {
-    when(patrimoineService.getPatrimone(any()))
-        .thenReturn(Optional.of(patrimoineDeZetySupplier.get()));
+    when(patrimoineService.getPatrimone(any())).thenReturn(patrimoineDeZetySupplier.get());
     when(patrimoineService.savePatrimoines(any())).thenReturn(List.of());
 
     assertTrue(subject.removePossession("test", "test").isEmpty());

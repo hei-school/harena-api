@@ -8,6 +8,6 @@ public class InternalServerErrorException extends ApiException {
   }
 
   public InternalServerErrorException() {
-    super("Internal Server Error", HttpStatus.BAD_REQUEST);
+    super("Internal Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
   }
 }

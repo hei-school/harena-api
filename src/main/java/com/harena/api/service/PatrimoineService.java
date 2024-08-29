@@ -1,72 +1,113 @@
 package com.harena.api.service;
 
+import com.harena.api.exception.InternalServerErrorException;
+import com.harena.api.exception.NotFoundException;
+import com.harena.api.file.BucketComponent;
+import com.harena.api.file.BucketConf;
+import com.harena.api.utils.PageRequest;
 import com.harena.api.utils.StringNormalizer;
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 import school.hei.patrimoine.modele.Patrimoine;
 import school.hei.patrimoine.serialisation.Serialiseur;
+import software.amazon.awssdk.core.exception.SdkClientException;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
+import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
+
+import static java.lang.StringTemplate.STR;
+import static java.nio.file.Files.createTempDirectory;
+import static java.nio.file.Files.createFile;
 
 @Log
 @Service
 @RequiredArgsConstructor
 public class PatrimoineService {
-  private final String PATRIMOINE_KEY = "patrimoines.db";
-  private final BucketProvider bucketProvider;
-  private final Serialiseur<HashMap<String, Patrimoine>> serializer = new Serialiseur<>();
+  private final String PATRIMOINE_KEY_PREFIX = "patrimoines/";
+  private final BucketComponent bucketComponent;
+  private final BucketConf bucketConf;
+  private final Serialiseur<Patrimoine> serializer = new Serialiseur<>();
 
-  @SneakyThrows
-  public Optional<Patrimoine> getPatrimone(String patrimoineName) {
-    String id = StringNormalizer.apply(patrimoineName);
-    File patrimoineFile = bucketProvider.getBucket().download(PATRIMOINE_KEY);
-    if (!patrimoineFile.exists()) {
-      return Optional.empty();
+  public Patrimoine getPatrimone(String patrimoineName) {
+    File patrimoineFile;
+    try {
+      patrimoineFile =
+          bucketComponent.download(PATRIMOINE_KEY_PREFIX + StringNormalizer.apply(patrimoineName));
+    } catch (SdkClientException e) {
+      if (e.getMessage().contains("Unable to load credentials")) {
+        throw new NotFoundException(STR."Patrimoine \{patrimoineName} not found");
+      }
+      throw e;
     }
 
-    HashMap<String, Patrimoine> patrimoine =
-        serializer.deserialise(Files.readString(patrimoineFile.toPath()));
-    log.info("Getting patrimoine of Id: " + id);
-    return Optional.ofNullable(patrimoine.get(id));
+    try {
+      return serializer.deserialise(Files.readString(patrimoineFile.toPath()));
+    } catch (IOException | ClassCastException e) {
+      throw new InternalServerErrorException(
+              STR."Could not read values of patrimoine \{patrimoineName}");
+    }
   }
 
-  @SneakyThrows
   public List<Patrimoine> savePatrimoines(List<Patrimoine> toSavePatrimoines) {
-    File oldPatrimoinesFile = bucketProvider.getBucket().download(PATRIMOINE_KEY);
-    if (!oldPatrimoinesFile.exists()) {
-      oldPatrimoinesFile.createNewFile();
-      HashMap<String, Patrimoine> emptyPatrimoine = new HashMap<>();
-      Files.writeString(oldPatrimoinesFile.toPath(), serializer.serialise(emptyPatrimoine));
+    try {
+      Path tempDir = createTempDirectory("harena-api-toSavePatrimoines");
+      toSavePatrimoines.forEach(patrimoine -> writeFile(tempDir, patrimoine));
+
+      bucketComponent.upload(tempDir.toFile(), PATRIMOINE_KEY_PREFIX);
+    } catch (IOException e) {
+      throw new InternalServerErrorException("Unable to save all objects");
     }
-
-    String oldPatrimoineString = Files.readString(oldPatrimoinesFile.toPath());
-    HashMap<String, Patrimoine> patrimoines = serializer.deserialise(oldPatrimoineString);
-    toSavePatrimoines.forEach(
-        patrimoine -> {
-          patrimoines.put(StringNormalizer.apply(patrimoine.nom().toLowerCase()), patrimoine);
-        });
-
-    String newPatrimoineString = serializer.serialise(patrimoines);
-    Path tmpFile = Files.createTempFile(PATRIMOINE_KEY, null);
-    File serializedPatrimoine = Files.writeString(tmpFile, newPatrimoineString).toFile();
-    bucketProvider.getBucket().upload(serializedPatrimoine, PATRIMOINE_KEY);
     return toSavePatrimoines;
   }
 
-  @SneakyThrows
-  public List<Patrimoine> getAllPatrimoine() {
-    File patrimoinesFile = bucketProvider.getBucket().download(PATRIMOINE_KEY);
-    if (!patrimoinesFile.exists()) {
-      return List.of();
+  public List<Patrimoine> getAllPatrimoine(PageRequest pageRequest) {
+    List<File> patrimoineFiles = new ArrayList<>();
+    var lsRequest =
+        ListObjectsV2Request.builder()
+            .bucket(bucketComponent.getBucketName())
+            .prefix(PATRIMOINE_KEY_PREFIX)
+            .maxKeys(pageRequest.pageSize())
+            .build();
+
+    ListObjectsV2Iterable lsIterable = bucketConf.getS3Client().listObjectsV2Paginator(lsRequest);
+
+    int pageNumber = 1;
+    for (ListObjectsV2Response objects : lsIterable) {
+      if (pageRequest.pageNumber() == pageNumber) {
+        objects
+            .contents()
+            .forEach(
+                    file -> patrimoineFiles.add(bucketComponent.download(file.key())));
+      }
+      pageNumber++;
     }
-    HashMap<String, Patrimoine> patrimoines =
-        serializer.deserialise(Files.readString(patrimoinesFile.toPath()));
-    return patrimoines.values().stream().toList();
+
+    return patrimoineFiles.stream()
+        .map(
+            file -> {
+              try {
+                return serializer.deserialise(Files.readString(file.toPath()));
+              } catch (IOException e) {
+                throw new InternalServerErrorException(
+                        STR."Cannot read \{file.getName()}");
+              }
+            })
+        .toList();
+  }
+
+  private void writeFile(Path parentDir, Patrimoine patrimoine) {
+    try {
+      Path filePath = createFile(parentDir.resolve(StringNormalizer.apply(patrimoine.nom())));
+      Files.writeString(filePath, serializer.serialise(patrimoine));
+    } catch (IOException e) {
+      throw new InternalServerErrorException("Unable to save all objects");
+    }
   }
 }

@@ -8,7 +8,6 @@ import com.harena.api.service.ProjectionFutureService;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
-import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -25,9 +24,10 @@ public class ProjectionFutureController {
       @PathVariable String nomPatrimoine,
       @RequestParam LocalDate debut,
       @RequestParam LocalDate fin) {
-    return new ListPayload<>(projectionFutureService.getFluxImpossibles(nomPatrimoine, debut, fin).stream()
-        .map(fluxImpossibleMapper::toRestModel)
-        .toList());
+    return new ListPayload<>(
+        projectionFutureService.getFluxImpossibles(nomPatrimoine, debut, fin).stream()
+            .map(fluxImpossibleMapper::toRestModel)
+            .toList());
   }
 
   @GetMapping(value = "graphe", produces = MediaType.IMAGE_PNG_VALUE)

@@ -3,7 +3,6 @@ package com.harena.api.service;
 import com.harena.api.utils.StringNormalizer;
 import java.io.File;
 import java.time.LocalDate;
-import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -19,26 +18,21 @@ public class ProjectionFutureService {
 
   public Set<FluxImpossibles> getFluxImpossibles(
       String patrimoineName, LocalDate startDate, LocalDate endDate) {
-    Optional<EvolutionPatrimoine> evolutionPatrimoine =
+    EvolutionPatrimoine evolutionPatrimoine =
         getEvolutionPatrimoine(patrimoineName, startDate, endDate);
-    if (evolutionPatrimoine.isEmpty()) {
-      return Set.of();
-    }
-    return evolutionPatrimoine.get().getFluxImpossibles();
+
+    return evolutionPatrimoine.getFluxImpossibles();
   }
 
   public File getGraph(String patrimoineName, LocalDate startDate, LocalDate endDate) {
-    Optional<EvolutionPatrimoine> evolutionPatrimoine =
+    EvolutionPatrimoine evolutionPatrimoine =
         getEvolutionPatrimoine(patrimoineName, startDate, endDate);
-    return evolutionPatrimoine
-        .map(patrimoine -> new GrapheurEvolutionPatrimoine().apply(patrimoine))
-        .orElse(null);
+    return new GrapheurEvolutionPatrimoine().apply(evolutionPatrimoine);
   }
 
-  private Optional<EvolutionPatrimoine> getEvolutionPatrimoine(
+  private EvolutionPatrimoine getEvolutionPatrimoine(
       String patrimoineName, LocalDate startDate, LocalDate endDate) {
-    Optional<Patrimoine> patrimoine =
-        patrimoineService.getPatrimone(StringNormalizer.apply(patrimoineName));
-    return patrimoine.map(value -> new EvolutionPatrimoine(value.nom(), value, startDate, endDate));
+    Patrimoine patrimoine = patrimoineService.getPatrimone(StringNormalizer.apply(patrimoineName));
+    return new EvolutionPatrimoine(patrimoine.nom(), patrimoine, startDate, endDate);
   }
 }
