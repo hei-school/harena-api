@@ -22,7 +22,6 @@ import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
 
-import static java.lang.StringTemplate.STR;
 import static java.nio.file.Files.createTempDirectory;
 import static java.nio.file.Files.createFile;
 
@@ -42,7 +41,7 @@ public class PatrimoineService {
           bucketComponent.download(PATRIMOINE_KEY_PREFIX + StringNormalizer.apply(patrimoineName));
     } catch (SdkClientException e) {
       if (e.getMessage().contains("Unable to load credentials")) {
-        throw new NotFoundException(STR."Patrimoine \{patrimoineName} not found");
+        throw new NotFoundException("Patrimoine " + patrimoineName + " not found");
       }
       throw e;
     }
@@ -51,7 +50,7 @@ public class PatrimoineService {
       return serializer.deserialise(Files.readString(patrimoineFile.toPath()));
     } catch (IOException | ClassCastException e) {
       throw new InternalServerErrorException(
-              STR."Could not read values of patrimoine \{patrimoineName}");
+              "Could not read values of patrimoine " + patrimoineName);
     }
   }
 
@@ -95,8 +94,7 @@ public class PatrimoineService {
               try {
                 return serializer.deserialise(Files.readString(file.toPath()));
               } catch (IOException e) {
-                throw new InternalServerErrorException(
-                        STR."Cannot read \{file.getName()}");
+                throw new InternalServerErrorException("Cannot read " + file.getName());
               }
             })
         .toList();
