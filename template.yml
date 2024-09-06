@@ -23,7 +23,9 @@ Globals:
         
         
         
-        
+        AWS_S3_BUCKET=dummy
+        AWS_SES_SOURCE=dummy
+
         
 
 Parameters:

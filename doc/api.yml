@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: harena
   description: harena
-  version: 1.0.0
+  version: latest
 servers:
   - url: 'http://localhost:8080'
 paths:
