@@ -413,21 +413,21 @@ components:
             possessions:
               type: array
               items:
-                $ref: "#/components/schemas/PossessionAvecType"
+                $ref: "#/components/schemas/Possession"
     AchatMaterielAuComptant:
       type: object
       allOf:
         - $ref: "#/components/schemas/PossessionAvecType"
         - properties:
             achatCommeGroupe:
-              $ref: "#/components/schemas/GroupePossession"
+              $ref: "#/components/schemas/Possession"
     TransfertArgent:
       type: object
       allOf:
         - $ref: "#/components/schemas/PossessionAvecType"
         - properties:
             transfertCommeGroupe:
-              $ref: "#/components/schemas/GroupePossession"
+              $ref: "#/components/schemas/Possession"
     FluxImpossibles:
       type: object
       properties:
