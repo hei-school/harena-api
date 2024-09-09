@@ -338,12 +338,19 @@ components:
             - ARGENT
             - MATERIEL
             - FLUXARGENT
+            - GROUPEPOSSESSION
+            - ACHATMATERIELAUCOMPTANT
+            - TRANSFERTARGENT
         argent:
           $ref: "#/components/schemas/Argent"
         materiel:
           $ref: "#/components/schemas/Materiel"
         flux_argent:
           $ref: "#/components/schemas/FluxArgent"
+        achat_materiel_au_comptant:
+          $ref: "#/components/schemas/AchatMaterielAuComptant"
+        transfert_argent:
+          $ref: "#/components/schemas/TransfertArgent"
     Patrimoine:
       type: object
       properties:
@@ -398,6 +405,29 @@ components:
               type: integer
             date_d_operation:
               type: integer
+    GroupePossession:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/PossessionAvecType"
+        - properties:
+            possessions:
+              type: array
+              items:
+                $ref: "#/components/schemas/PossessionAvecType"
+    AchatMaterielAuComptant:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/PossessionAvecType"
+        - properties:
+            achatCommeGroupe:
+              $ref: "#/components/schemas/GroupePossession"
+    TransfertArgent:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/PossessionAvecType"
+        - properties:
+            transfertCommeGroupe:
+              $ref: "#/components/schemas/GroupePossession"
     FluxImpossibles:
       type: object
       properties:
