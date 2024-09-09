@@ -427,7 +427,7 @@ components:
         - $ref: "#/components/schemas/PossessionAvecType"
         - properties:
             transfertCommeGroupe:
-              $ref: "#/components/schemas/Possession"
+              $ref: "#/components/schemas/GroupePossession"
     FluxImpossibles:
       type: object
       properties:
