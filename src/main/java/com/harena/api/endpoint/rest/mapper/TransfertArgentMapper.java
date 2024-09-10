@@ -49,7 +49,6 @@ class TransfertArgentMapper implements Mapper<TransfertArgent, com.harena.api.en
   @Override
   public TransfertArgent toObjectModel(com.harena.api.endpoint.rest.model.TransfertArgent restModel) {
     var nom = restModel.getNom();
-    var tTime = restModel.getT();
     var restDevise = restModel.getDevise();
     Argent depuisArgent = argentMapper.toObjectModel(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(restModel.getTransfertCommeGroupe()).getPossessions()).getFirst().getFluxArgent()).getArgent()));
     Argent versArgent = argentMapper.toObjectModel(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(Objects.requireNonNull(restModel.getTransfertCommeGroupe()).getPossessions()).getLast().getFluxArgent()).getArgent()));

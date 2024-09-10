@@ -420,7 +420,7 @@ components:
         - $ref: "#/components/schemas/PossessionAvecType"
         - properties:
             achatCommeGroupe:
-              $ref: "#/components/schemas/Possession"
+              $ref: "#/components/schemas/GroupePossession"
     TransfertArgent:
       type: object
       allOf:
