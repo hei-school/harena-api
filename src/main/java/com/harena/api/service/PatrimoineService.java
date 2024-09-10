@@ -1,5 +1,8 @@
 package com.harena.api.service;
 
+import static java.nio.file.Files.createFile;
+import static java.nio.file.Files.createTempDirectory;
+
 import com.harena.api.exception.InternalServerErrorException;
 import com.harena.api.exception.NotFoundException;
 import com.harena.api.file.BucketComponent;
@@ -21,9 +24,6 @@ import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
 import software.amazon.awssdk.services.s3.paginators.ListObjectsV2Iterable;
-
-import static java.nio.file.Files.createTempDirectory;
-import static java.nio.file.Files.createFile;
 
 @Log
 @Service
@@ -50,7 +50,7 @@ public class PatrimoineService {
       return serializer.deserialise(Files.readString(patrimoineFile.toPath()));
     } catch (IOException | ClassCastException e) {
       throw new InternalServerErrorException(
-              "Could not read values of patrimoine " + patrimoineName);
+          "Could not read values of patrimoine " + patrimoineName);
     }
   }
 
@@ -82,8 +82,7 @@ public class PatrimoineService {
       if (pageRequest.pageNumber() == pageNumber) {
         objects
             .contents()
-            .forEach(
-                    file -> patrimoineFiles.add(bucketComponent.download(file.key())));
+            .forEach(file -> patrimoineFiles.add(bucketComponent.download(file.key())));
       }
       pageNumber++;
     }

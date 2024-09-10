@@ -1,11 +1,11 @@
 package com.harena.api.endpoint.rest.mapper;
 
+import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.*;
+import static java.util.Objects.requireNonNull;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.possession.*;
-
-import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.*;
-import static java.util.Objects.requireNonNull;
 
 @Component
 @RequiredArgsConstructor
@@ -33,11 +33,11 @@ public class PossesionMapper
       possession.setType(ARGENT);
       var money = argentMapper.toRestModel(argent);
       possession.setArgent(money);
-    }else if (objectModel instanceof AchatMaterielAuComptant achatMaterielAuComptant) {
+    } else if (objectModel instanceof AchatMaterielAuComptant achatMaterielAuComptant) {
       possession.setType(ACHATMATERIELAUCOMPTANT);
       var material = achatMaterielAuComptantMapper.toRestModel(achatMaterielAuComptant);
       possession.setAchatMaterielAuComptant(material);
-    }else if (objectModel instanceof TransfertArgent transfertArgent) {
+    } else if (objectModel instanceof TransfertArgent transfertArgent) {
       possession.setType(TRANSFERTARGENT);
       var money = transfertArgentMapper.toRestModel(transfertArgent);
       possession.setTransfertArgent(money);
@@ -50,8 +50,10 @@ public class PossesionMapper
     return switch (requireNonNull(restModel.getType())) {
       case FLUXARGENT -> fluxAgentMapper.toObjectModel(requireNonNull(restModel.getFluxArgent()));
       case MATERIEL -> materielMapper.toObjectModel(requireNonNull(restModel.getMateriel()));
-      case ACHATMATERIELAUCOMPTANT -> achatMaterielAuComptantMapper.toObjectModel(requireNonNull(restModel.getAchatMaterielAuComptant()));
-      case TRANSFERTARGENT -> transfertArgentMapper.toObjectModel(requireNonNull(restModel.getTransfertArgent()));
+      case ACHATMATERIELAUCOMPTANT -> achatMaterielAuComptantMapper.toObjectModel(
+          requireNonNull(restModel.getAchatMaterielAuComptant()));
+      case TRANSFERTARGENT -> transfertArgentMapper.toObjectModel(
+          requireNonNull(restModel.getTransfertArgent()));
       default -> argentMapper.toObjectModel(requireNonNull(restModel.getArgent()));
     };
   }
