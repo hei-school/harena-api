@@ -1,12 +1,12 @@
 package com.harena.api.endpoint.rest.mapper;
 
-import java.time.LocalDate;
-import java.util.Objects;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.possession.*;
+
+import java.time.LocalDate;
+import java.util.Set;
 
 @Component
 @RequiredArgsConstructor
@@ -46,9 +46,6 @@ class TransfertArgentMapper
 
     return new com.harena.api.endpoint.rest.model.TransfertArgent()
         .nom(objectModel.getNom())
-        .t(objectModel.getT())
-        .valeurComptable(objectModel.getValeurComptable())
-        .devise(deviseMapper.toRestModel(objectModel.getDevise()))
         .transfertCommeGroupe(restGroupePossession);
   }
 
@@ -56,45 +53,13 @@ class TransfertArgentMapper
   public TransfertArgent toObjectModel(
       com.harena.api.endpoint.rest.model.TransfertArgent restModel) {
     var nom = restModel.getNom();
+    Argent depuisArgent = argentMapper.toObjectModel(restModel.getDepuisArgent());
+    Argent versArgent = argentMapper.toObjectModel(restModel.getVersArgent());
     var restDevise = restModel.getDevise();
-    Argent depuisArgent =
-        argentMapper.toObjectModel(
-            Objects.requireNonNull(
-                Objects.requireNonNull(
-                        Objects.requireNonNull(
-                                Objects.requireNonNull(restModel.getTransfertCommeGroupe())
-                                    .getPossessions())
-                            .getFirst()
-                            .getFluxArgent())
-                    .getArgent()));
-    Argent versArgent =
-        argentMapper.toObjectModel(
-            Objects.requireNonNull(
-                Objects.requireNonNull(
-                        Objects.requireNonNull(
-                                Objects.requireNonNull(restModel.getTransfertCommeGroupe())
-                                    .getPossessions())
-                            .getLast()
-                            .getFluxArgent())
-                    .getArgent()));
-    LocalDate debut =
-        restModel.getTransfertCommeGroupe().getPossessions().getFirst().getFluxArgent().getDebut();
-    LocalDate fin =
-        restModel.getTransfertCommeGroupe().getPossessions().getFirst().getFluxArgent().getFin();
-    var fluxMensuel =
-        restModel
-            .getTransfertCommeGroupe()
-            .getPossessions()
-            .getFirst()
-            .getFluxArgent()
-            .getFluxMensuel();
-    var dateOperation =
-        restModel
-            .getTransfertCommeGroupe()
-            .getPossessions()
-            .getFirst()
-            .getFluxArgent()
-            .getDateDOperation();
+    LocalDate debut = restModel.getDebut();
+    LocalDate fin = restModel.getFin();
+    var fluxMensuel = restModel.getFluxMensuel();
+    var dateOperation = restModel.getDateDOperation();
     if (restDevise == null) {
       return new TransfertArgent(
           nom, depuisArgent, versArgent, debut, fin, fluxMensuel, dateOperation);

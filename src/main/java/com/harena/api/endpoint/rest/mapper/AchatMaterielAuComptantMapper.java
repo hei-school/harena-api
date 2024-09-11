@@ -1,13 +1,14 @@
 package com.harena.api.endpoint.rest.mapper;
 
-import static java.util.Objects.requireNonNullElse;
-
-import java.util.Objects;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.possession.*;
+
+import java.util.Objects;
+import java.util.Set;
+
+import static java.util.Objects.requireNonNullElse;
 
 @Component
 @RequiredArgsConstructor
@@ -61,16 +62,8 @@ class AchatMaterielAuComptantMapper
     var tTime = restModel.getT();
     int valeurComptableALAchat = requireNonNullElse(restModel.getValeurComptable(), 0);
     var restDevise = restModel.getDevise();
-    Double tauxAppreciationAnnuelle =
-        Objects.requireNonNull(
-                Objects.requireNonNull(
-                        Objects.requireNonNull(restModel.getAchatCommeGroupe()).getPossessions())
-                    .getFirst()
-                    .getMateriel())
-            .getTauxDappreciationAnnuel();
-    Argent financeur =
-        argentMapper.toObjectModel(
-            restModel.getAchatCommeGroupe().getPossessions().getLast().getFluxArgent().getArgent());
+    var tauxAppreciationAnnuelle = restModel.getTauxDappreciationAnnuel();
+    Argent financeur = argentMapper.toObjectModel(Objects.requireNonNull(restModel.getFinanceur()));
     if (restDevise == null) {
       return new AchatMaterielAuComptant(
           nom, tTime, valeurComptableALAchat, tauxAppreciationAnnuelle, financeur);
