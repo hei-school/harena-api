@@ -337,10 +337,10 @@ components:
           enum:
             - ARGENT
             - MATERIEL
-            - FLUXARGENT
-            - GROUPEPOSSESSION
-            - ACHATMATERIELAUCOMPTANT
-            - TRANSFERTARGENT
+            - FLUX_ARGENT
+            - GROUPE_POSSESSION
+            - ACHAT_MATERIEL_AU_COMPTANT
+            - TRANSFERT_ARGENT
         argent:
           $ref: "#/components/schemas/Argent"
         materiel:
