@@ -1,17 +1,16 @@
 package com.harena.api.service;
 
-import com.harena.api.conf.FacadeIT;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import school.hei.patrimoine.cas.zety.PatrimoineZetyAu3Juillet2024;
-
-import java.time.LocalDate;
-
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+
+import com.harena.api.conf.FacadeIT;
+import java.time.LocalDate;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import school.hei.patrimoine.cas.zety.PatrimoineZetyAu3Juillet2024;
 
 public class ProjectionFutureServiceIT extends FacadeIT {
   @MockBean PatrimoineService patrimoineService;

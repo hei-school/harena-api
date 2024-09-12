@@ -1,16 +1,15 @@
 package com.harena.api.endpoint.rest.mapper;
 
+import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.FLUX_ARGENT;
+import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.MATERIEL;
+import static java.util.Objects.requireNonNullElse;
+
+import java.util.Objects;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.possession.*;
-
-import java.util.Objects;
-import java.util.Set;
-
-import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.FLUX_ARGENT;
-import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.MATERIEL;
-import static java.util.Objects.requireNonNullElse;
 
 @Component
 @RequiredArgsConstructor
@@ -21,7 +20,6 @@ class AchatMaterielAuComptantMapper
   private final ArgentMapper argentMapper;
   private final FluxAgentMapper fluxAgentMapper;
   private final MaterielMapper materielMapper;
-
 
   @SneakyThrows
   private static Object getPrivateFieldValue(String fieldName, Object instance) {
@@ -49,19 +47,22 @@ class AchatMaterielAuComptantMapper
     restGroupePossession.setDevise(deviseMapper.toRestModel(groupePossession.getDevise()));
     restGroupePossession.setValeurComptable(groupePossession.getValeurComptable());
     restGroupePossession.setPossessions(
-            possessions.stream().map(item -> {
-              var possession = new com.harena.api.endpoint.rest.model.Possession();
-              if (item instanceof FluxArgent fluxArgent) {
-                possession.setType(FLUX_ARGENT);
-                var flux = fluxAgentMapper.toRestModel(fluxArgent);
-                possession.setFluxArgent(flux);
-              } else if (item instanceof Materiel materiel) {
-                possession.setType(MATERIEL);
-                var material = materielMapper.toRestModel(materiel);
-                possession.setMateriel(material);
-              }
-              return possession;
-            }).toList());
+        possessions.stream()
+            .map(
+                item -> {
+                  var possession = new com.harena.api.endpoint.rest.model.Possession();
+                  if (item instanceof FluxArgent fluxArgent) {
+                    possession.setType(FLUX_ARGENT);
+                    var flux = fluxAgentMapper.toRestModel(fluxArgent);
+                    possession.setFluxArgent(flux);
+                  } else if (item instanceof Materiel materiel) {
+                    possession.setType(MATERIEL);
+                    var material = materielMapper.toRestModel(materiel);
+                    possession.setMateriel(material);
+                  }
+                  return possession;
+                })
+            .toList());
 
     return new com.harena.api.endpoint.rest.model.AchatMaterielAuComptant()
         .nom(objectModel.getNom())

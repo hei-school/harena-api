@@ -1,11 +1,11 @@
 package com.harena.api.endpoint.rest.mapper;
 
+import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.*;
+import static java.util.Objects.requireNonNull;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.possession.*;
-
-import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.*;
-import static java.util.Objects.requireNonNull;
 
 @Component
 @RequiredArgsConstructor

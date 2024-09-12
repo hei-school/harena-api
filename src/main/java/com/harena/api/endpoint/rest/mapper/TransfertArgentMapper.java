@@ -1,14 +1,13 @@
 package com.harena.api.endpoint.rest.mapper;
 
+import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.FLUX_ARGENT;
+
+import java.time.LocalDate;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.springframework.stereotype.Component;
 import school.hei.patrimoine.modele.possession.*;
-
-import java.time.LocalDate;
-import java.util.Set;
-
-import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.FLUX_ARGENT;
 
 @Component
 @RequiredArgsConstructor
@@ -45,15 +44,18 @@ class TransfertArgentMapper
     restGroupePossession.setDevise(deviseMapper.toRestModel(groupePossession.getDevise()));
     restGroupePossession.setValeurComptable(groupePossession.getValeurComptable());
     restGroupePossession.setPossessions(
-        possessions.stream().map(item -> {
-          var possession = new com.harena.api.endpoint.rest.model.Possession();
-          if (item instanceof FluxArgent fluxArgent) {
-            possession.setType(FLUX_ARGENT);
-            var flux = fluxAgentMapper.toRestModel(fluxArgent);
-            possession.setFluxArgent(flux);
-          }
-          return possession;
-        }).toList());
+        possessions.stream()
+            .map(
+                item -> {
+                  var possession = new com.harena.api.endpoint.rest.model.Possession();
+                  if (item instanceof FluxArgent fluxArgent) {
+                    possession.setType(FLUX_ARGENT);
+                    var flux = fluxAgentMapper.toRestModel(fluxArgent);
+                    possession.setFluxArgent(flux);
+                  }
+                  return possession;
+                })
+            .toList());
 
     return new com.harena.api.endpoint.rest.model.TransfertArgent()
         .nom(objectModel.getNom())

@@ -5,13 +5,12 @@ import com.harena.api.endpoint.rest.model.FluxJournalier;
 import com.harena.api.endpoint.rest.model.ListPayload;
 import com.harena.api.exception.InternalServerErrorException;
 import com.harena.api.service.ProjectionFutureService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.time.LocalDate;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
