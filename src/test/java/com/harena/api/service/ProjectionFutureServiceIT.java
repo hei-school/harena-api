@@ -24,7 +24,7 @@ public class ProjectionFutureServiceIT extends FacadeIT {
     var startDate = LocalDate.of(2024, 7, 27);
     var endDate = LocalDate.of(2034, 2, 16);
 
-    assertFalse(subject.getFluxImpossibles("test", startDate, endDate).isEmpty());
+    assertFalse(subject.getFluxJournaliers("test", startDate, endDate).isEmpty());
 
     assertTrue(subject.getGraph("test", startDate, endDate).exists());
   }

@@ -1,0 +1,1 @@
+AWS_S3_BUCKET: !Sub '{{resolve:ssm:/harena-api/${Env}/s3/bucket-name}}'

@@ -1,8 +1,8 @@
     maven {
-        url System.getenv("CODEARTIFACT_URL")
-        credentials {
-            username System.getenv("CODEARTIFACT_USERNAME")
-            password System.getenv("CODEARTIFACT_PASSWORD")
-        }
+      url 'https://maven-hei-lab-057045785189.d.codeartifact.eu-west-3.amazonaws.com/maven/patrimoine/'
+      credentials {
+          username "aws"
+          password System.env.CODEARTIFACT_AUTH_TOKEN
+      }
     }
     mavenLocal()

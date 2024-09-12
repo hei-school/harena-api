@@ -2,7 +2,7 @@ openapi: 3.0.3
 info:
   title: harena
   description: harena
-  version: 1.0.0
+  version: latest
 servers:
   - url: 'http://localhost:8080'
 paths:
@@ -203,19 +203,19 @@ paths:
           $ref: '#/components/responses/429'
         '500':
           $ref: '#/components/responses/500'
-  /patrimoines/{nom_patrimoine}/flux-impossibles:
+  /patrimoines/{nom_patrimoine}/flux-journaliers:
     get:
       tags:
         - projection_future
-      operationId: getPatrimoineFluxImpossibles
-      summary: obtenir une liste des flux impossibles du patrimoine dans une intervalle donnée
+      operationId: getPatrimoineFluxJournalier
+      summary: obtenir une liste des flux journaliers du patrimoine dans une intervalle donnée
       parameters:
         - $ref: "#/components/parameters/nom_patrimoine"
         - $ref: "#/components/parameters/debut"
         - $ref: "#/components/parameters/fin"
       responses:
         '200':
-          description: flux impossibles du patrimoine actuel selon une plage de date donnée
+          description: flux journaliers du patrimoine actuel selon une plage de date donnée
           content:
             'application/json':
               schema:
@@ -224,7 +224,7 @@ paths:
                   data:
                     type: array
                     items:
-                      $ref: "#/components/schemas/FluxImpossibles"
+                      $ref: "#/components/schemas/FluxJournalier"
         '400':
           $ref: '#/components/responses/400'
         '404':
@@ -337,13 +337,20 @@ components:
           enum:
             - ARGENT
             - MATERIEL
-            - FLUXARGENT
+            - FLUX_ARGENT
+            - GROUPE_POSSESSION
+            - ACHAT_MATERIEL_AU_COMPTANT
+            - TRANSFERT_ARGENT
         argent:
           $ref: "#/components/schemas/Argent"
         materiel:
           $ref: "#/components/schemas/Materiel"
         flux_argent:
           $ref: "#/components/schemas/FluxArgent"
+        achat_materiel_au_comptant:
+          $ref: "#/components/schemas/AchatMaterielAuComptant"
+        transfert_argent:
+          $ref: "#/components/schemas/TransfertArgent"
     Patrimoine:
       type: object
       properties:
@@ -398,16 +405,55 @@ components:
               type: integer
             date_d_operation:
               type: integer
-    FluxImpossibles:
+    GroupePossession:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/PossessionAvecType"
+        - properties:
+            possessions:
+              type: array
+              items:
+                $ref: "#/components/schemas/Possession"
+    AchatMaterielAuComptant:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/Materiel"
+        - properties:
+            financeur:
+              $ref: "#/components/schemas/Argent"
+            achatCommeGroupe:
+              $ref: "#/components/schemas/GroupePossession"
+    TransfertArgent:
       type: object
       properties:
-        nom_argent:
+        nom:
           type: string
+        depuis_argent:
+          $ref: "#/components/schemas/Argent"
+        vers_argent:
+          $ref: "#/components/schemas/Argent"
+        debut:
+          type: string
+          format: date
+        fin:
+          type: string
+          format: date
+        flux_mensuel:
+          type: integer
+        date_d_operation:
+          type: integer
+        devise:
+          $ref: "#/components/schemas/Devise"
+        transfertCommeGroupe:
+          $ref: "#/components/schemas/GroupePossession"
+    FluxJournalier:
+      type: object
+      properties:
         date:
           type: string
           format: date
-        valeur_argent:
-          type: integer
+        argent:
+          $ref: "#/components/schemas/Argent"
         flux_argents:
           type: array
           items:

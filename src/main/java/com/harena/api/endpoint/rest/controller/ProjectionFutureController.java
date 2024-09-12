@@ -1,7 +1,7 @@
 package com.harena.api.endpoint.rest.controller;
 
-import com.harena.api.endpoint.rest.mapper.FluxImpossibleMapper;
-import com.harena.api.endpoint.rest.model.FluxImpossibles;
+import com.harena.api.endpoint.rest.mapper.FluxJournalierMapper;
+import com.harena.api.endpoint.rest.model.FluxJournalier;
 import com.harena.api.endpoint.rest.model.ListPayload;
 import com.harena.api.exception.InternalServerErrorException;
 import com.harena.api.service.ProjectionFutureService;
@@ -17,16 +17,16 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/patrimoines/{nomPatrimoine}")
 public class ProjectionFutureController {
   private final ProjectionFutureService projectionFutureService;
-  private final FluxImpossibleMapper fluxImpossibleMapper;
+  private final FluxJournalierMapper fluxJournalierMapper;
 
-  @GetMapping("flux-impossibles")
-  public ListPayload<FluxImpossibles> fluxImpossibles(
+  @GetMapping("flux-journaliers")
+  public ListPayload<FluxJournalier> fluxJournaliers(
       @PathVariable String nomPatrimoine,
       @RequestParam LocalDate debut,
       @RequestParam LocalDate fin) {
     return new ListPayload<>(
-        projectionFutureService.getFluxImpossibles(nomPatrimoine, debut, fin).stream()
-            .map(fluxImpossibleMapper::toRestModel)
+        projectionFutureService.getFluxJournaliers(nomPatrimoine, debut, fin).stream()
+            .map(fluxJournalierMapper::toRestModel)
             .toList());
   }
 
