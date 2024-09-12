@@ -8,13 +8,16 @@ import school.hei.patrimoine.modele.possession.*;
 import java.time.LocalDate;
 import java.util.Set;
 
+import static com.harena.api.endpoint.rest.model.Possession.TypeEnum.FLUX_ARGENT;
+
 @Component
 @RequiredArgsConstructor
 class TransfertArgentMapper
     implements Mapper<TransfertArgent, com.harena.api.endpoint.rest.model.TransfertArgent> {
   private final DeviseMapper deviseMapper;
-  private final PossesionMapper possesionMapper;
   private final ArgentMapper argentMapper;
+
+  private final FluxAgentMapper fluxAgentMapper;
 
   @SneakyThrows
   private static Object getPrivateFieldValue(String fieldName, Object instance) {
@@ -42,7 +45,15 @@ class TransfertArgentMapper
     restGroupePossession.setDevise(deviseMapper.toRestModel(groupePossession.getDevise()));
     restGroupePossession.setValeurComptable(groupePossession.getValeurComptable());
     restGroupePossession.setPossessions(
-        possessions.stream().map(possesionMapper::toRestModel).toList());
+        possessions.stream().map(item -> {
+          var possession = new com.harena.api.endpoint.rest.model.Possession();
+          if (item instanceof FluxArgent fluxArgent) {
+            possession.setType(FLUX_ARGENT);
+            var flux = fluxAgentMapper.toRestModel(fluxArgent);
+            possession.setFluxArgent(flux);
+          }
+          return possession;
+        }).toList());
 
     return new com.harena.api.endpoint.rest.model.TransfertArgent()
         .nom(objectModel.getNom())
